@@ -8,9 +8,11 @@ const getUserFromStorage = () => {
     }
 };
 
+const storedUser = getUserFromStorage(); // Store once
+
 const initialState = {
-    user: getUserFromStorage(),  
-    isAuthenticated: !!getUserFromStorage(),
+    user: storedUser,  
+    isAuthenticated: !!storedUser,
 };
 
 const authSlice = createSlice({
@@ -20,14 +22,14 @@ const authSlice = createSlice({
         setUser: (state, action) => {
             state.user = action.payload;
             state.isAuthenticated = true;
-            localStorage.setItem("user", JSON.stringify(action.payload));  // Store in localStorage
-            document.cookie = `user=${JSON.stringify(action.payload)}; path=/; secure`; // Store in cookies
+            localStorage.setItem("user", JSON.stringify(action.payload));  
+            document.cookie = `user=${encodeURIComponent(JSON.stringify(action.payload))}; path=/; secure`; 
         },
         logoutUser: (state) => {
             state.user = null;
             state.isAuthenticated = false;
-            localStorage.removeItem("user");  // Remove from localStorage
-            document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // Remove cookie
+            localStorage.removeItem("user");  
+            document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         },
     },
 });

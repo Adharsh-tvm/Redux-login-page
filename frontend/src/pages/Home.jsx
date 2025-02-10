@@ -23,8 +23,12 @@ const Home = () => {
 
     const handleLogout = async () => {
         await authService.logoutUser();
-        dispatch(logoutUser()); // Remove from Redux store
+        dispatch({ type: "auth/logout" }); // ✅ Dispatch a plain object to Redux
+
+        console.log("Logged Out");
+        
         navigate("/login"); // Redirect to login page
+
       };
 
     return (

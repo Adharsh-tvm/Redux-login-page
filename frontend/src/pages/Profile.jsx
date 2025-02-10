@@ -2,12 +2,16 @@ import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
 import { setUser } from "../redux/slices/authSlice"; // Import Redux action
 import { Box, Button, TextField, Avatar, Typography } from "@mui/material";
+import { useNavigate } from "react-router";
 
 const Profile = () => {
+
     const dispatch = useDispatch();
     const user = useSelector((state) => state.auth.user);
     console.log(user);
     
+    const navigate = useNavigate()
+
     const [username, setUsername] = useState(user?.username || "");
     const [profilePic, setProfilePic] = useState(user?.profilePic || "");
     const [editing, setEditing] = useState(false);
@@ -54,7 +58,8 @@ const Profile = () => {
                             <Typography variant="h6">{user.username}</Typography>
                             <Typography variant="body1">{user.email}</Typography>
                             <Typography variant="body2">Admin: {user.isAdmin ? "Yes" : "No"}</Typography>
-                            <Button variant="outlined" onClick={() => setEditing(true)} sx={{ mt: 2 }}>Edit Profile</Button>
+                            <Button variant="outlined" onClick={() => setEditing(true)} sx={{ mt: 2 }}>Edit Profile</Button> <br />
+                            <Button variant="text" onClick={()=>navigate(-1)} sx={{ mt: 2  }} >Back</Button>
                         </>
                     )}
                 </>
