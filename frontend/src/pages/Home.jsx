@@ -10,6 +10,8 @@ const Home = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const user = useSelector((state) => state.auth.user); 
+    console.log(user);
+    
 
     const handleProfileClick = () => {
         if (user) {
