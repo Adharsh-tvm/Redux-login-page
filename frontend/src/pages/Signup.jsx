@@ -24,6 +24,7 @@ const Signup = () => {
       });
   
       console.log("Signup success:", response.data);
+      
       navigate("/home");
     } catch (err) {
         console.log(err);
