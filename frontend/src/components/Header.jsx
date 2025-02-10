@@ -1,6 +1,5 @@
 import React from "react";
-import { useForm } from "react-hook-form";
-import { AppBar, Toolbar, Typography, Button, TextField, Container, Box } from "@mui/material";
+import { AppBar, Toolbar, Typography, Button } from "@mui/material";
 
 const Header = ({ onLogout }) => {
   return (
@@ -9,11 +8,12 @@ const Header = ({ onLogout }) => {
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           My App
         </Typography>
-        <Button color="inherit" onClick={onLogout}>Logout</Button>
+        <Button color="inherit" onClick={onLogout}>
+          Logout
+        </Button>
       </Toolbar>
     </AppBar>
   );
 };
-
 
 export default Header;

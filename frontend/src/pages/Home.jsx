@@ -3,17 +3,31 @@ import { Container, Box, Typography, Avatar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { useDispatch, useSelector } from "react-redux";
+import authService from "../services/authService";
 
-const Home = ({ user }) => {
+const Home = () => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const user = useSelector((state) => state.auth.user); 
 
     const handleProfileClick = () => {
-        navigate("/profile"); // Navigate to the Profile page
+        if (user) {
+            navigate("/profile");
+        } else {
+            navigate("/login"); // Redirect to login if no user
+        }
     };
+
+    const handleLogout = async () => {
+        await authService.logoutUser();
+        dispatch(logoutUser()); // Remove from Redux store
+        navigate("/login"); // Redirect to login page
+      };
 
     return (
         <>
-            <Header />
+            <Header onLogout={handleLogout} />
             <Container maxWidth="sm">
                 <Box
                     sx={{
@@ -25,18 +39,18 @@ const Home = ({ user }) => {
                         boxShadow: 3,
                         borderRadius: 2,
                         bgcolor: "background.paper",
-                        cursor: "pointer", // Makes it clear that it's clickable
-                        "&:hover": { boxShadow: 6 }, // Slight hover effect
+                        cursor: "pointer",
+                        "&:hover": { boxShadow: 6 },
                     }}
                     onClick={handleProfileClick}
                 >
                     <Avatar
-                        src={user?.profilePicture || "https://via.placeholder.com/150"}
-                        alt="Profile Picture"
+                        // src={user?.profilePicture || "https://via.placeholder.com/150"}
+                        alt={user?.username || "Guest"}
                         sx={{ width: 100, height: 100, mb: 2 }}
                     />
                     <Typography variant="h5">
-                        {user?.username || "Guest"}
+                        {user ? user.username : "Guest"}
                     </Typography>
                 </Box>
             </Container>
