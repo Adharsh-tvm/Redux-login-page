@@ -10,7 +10,7 @@ const createUser = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "Please fill all the fields" });
     }
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ $or: [{ email }, { username }] });
     if (userExists) {
         return res.status(400).json({ message: "User already exists" });
     }
@@ -36,30 +36,34 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 
-const loginUser = asyncHandler(async(req, res) => {
-    const {email, password } = req.body
+const loginUser = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
 
+    // Check if the user exists
+    const existingUser = await User.findOne({ email });
 
-    const existingUser = await User.findOne({email})
-
-    if(existingUser) {
-        const isPasswordValid = await bcrypt.compare(password, existingUser.password)
-
-        if(isPasswordValid) {
-            createToken(res, existingUser._id)
-
-            res
-        .status(201)
-        .json({
-            _id:existingUser._id, 
-            username: existingUser.username, 
-            email: existingUser.email, 
-            isAdmin: existingUser.isAdmin
-        });
-        return 
-        }
+    if (!existingUser) {
+        return res.status(400).json({ message: "User does not exist. Please sign up first." });
     }
+
+    // Check if the password is correct
+    const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+
+    if (!isPasswordValid) {
+        return res.status(401).json({ message: "Invalid email or password." });
+    }
+
+    // If authentication is successful, create token and return user data
+    createToken(res, existingUser._id);
+
+    return res.status(200).json({
+        _id: existingUser._id,
+        username: existingUser.username,
+        email: existingUser.email,
+        isAdmin: existingUser.isAdmin,
+    });
 });
+
 
 
 const logoutCurrentUser = asyncHandler(async (req, res) => {
@@ -74,9 +78,9 @@ const logoutCurrentUser = asyncHandler(async (req, res) => {
 
 
 const getAllUsers = asyncHandler(async (req, res) => {
-    const Users = await User.find({});
-    res.json(users)
-})
+    const users = await User.find({}).select("-password"); // Exclude passwords
+    res.json(users);
+});
 
 const getCurrentUserProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id)

@@ -5,6 +5,7 @@ import Signup from "./pages/SignUp";
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import { useState } from "react";
+import AdminLogin from "./pages/AdminLogin";
 
 function App() {
   const [user, setUser] = useState({
@@ -19,6 +20,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/profile" element={<Profile user={user} />} />
       </Routes>
   );

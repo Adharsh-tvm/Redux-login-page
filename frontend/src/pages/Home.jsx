@@ -28,7 +28,7 @@ const Home = () => {
             navigate('/login')
         }
 
-    })
+    },[navigate])
 
     const handleLogout = async () => {
         await authService.logoutUser();

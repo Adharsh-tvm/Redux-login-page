@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/slices/authSlice";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router-dom"; // ✅ Import Link
 import axios from "axios";
 import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
@@ -12,7 +12,6 @@ const Login = () => {
     const dispatch = useDispatch();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,14 +21,11 @@ const Login = () => {
                 withCredentials: true, // Ensures cookies are sent
             });
 
-
             console.log("Login success:", response.data);
 
             dispatch(setUser(response.data));  // Store in Redux & LocalStorage
 
-            toast.success("Login successful!", { position: "top-right" })
-
-            
+            toast.success("Login successful!", { position: "top-center" });
 
             setTimeout(() => {
                 navigate("/home");
@@ -37,30 +33,30 @@ const Login = () => {
 
         } catch (err) {
             console.error(err);
-            if (err.response && err.response.status === 401) {
-                toast.error("Invalid credentials. Please try again.", { position: "top-right" });
+            if (err.response) {
+                // Show different error messages based on backend response
+                if (err.response.status === 400) {
+                    toast.error(err.response.data.message || "User does not exist.", { position: "top-right" });
+                } else if (err.response.status === 401) {
+                    toast.error("Invalid email or password. Please try again.", { position: "top-right" });
+                } else {
+                    toast.error("Login failed. Something went wrong.", { position: "top-right" });
+                }
             } else {
-                toast.error("Login failed. Something went wrong.", { position: "top-right" });
+                toast.error("Server error. Please try again later.", { position: "top-right" });
             }
-            // setError("Login failed. Check your credentials.");
         }
     };
 
-    useEffect(()=> {
-       let data = localStorage.getItem("user") 
+    useEffect(() => {
+        let data = localStorage.getItem("user");
 
-       console.log(data);
-       
-
-       if(data){
-        navigate('/home')
-       }else{
-        navigate('/login')
-       }
-
-
-    },[navigate])
-
+        if (data) {
+            navigate('/home');
+        }else{
+            navigate('/login')
+        }
+    }, [navigate]);
 
     return (
         <Container maxWidth="xs">
@@ -80,8 +76,6 @@ const Login = () => {
                 <Typography variant="h5" gutterBottom>
                     Login
                 </Typography>
-                
-                {error && <Typography color="error">{error}</Typography>}
 
                 <TextField
                     fullWidth
@@ -109,6 +103,14 @@ const Login = () => {
                 >
                     Login
                 </Button>
+
+                {/* ✅ "Not registered? Sign up" link */}
+                <Typography variant="body2" sx={{ mt: 2 }}>
+                    Not registered?{" "}
+                    <Link to="/signup" style={{ textDecoration: "none", color: "blue" }}>
+                        Sign up here
+                    </Link>
+                </Typography>
             </Box>
         </Container>
     );
