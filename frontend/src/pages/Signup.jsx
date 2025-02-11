@@ -26,6 +26,14 @@ const Signup = () => {
                 withCredentials: true, // Important for sending cookies
             });
 
+            let userData = localStorage.getItem('user')
+
+            if(userData){
+                navigate('/home')
+            }else{
+                navigate('/signup')
+            }
+
             console.log("Signup success:", response.data);
 
             dispatch(setUser(response.data));  // Store in Redux & LocalStorage

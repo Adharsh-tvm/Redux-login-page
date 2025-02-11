@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/slices/authSlice";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -20,20 +22,49 @@ const Login = () => {
                 withCredentials: true, // Ensures cookies are sent
             });
 
+
             console.log("Login success:", response.data);
 
             dispatch(setUser(response.data));  // Store in Redux & LocalStorage
 
-            navigate("/home");
+            toast.success("Login successful!", { position: "top-right" })
+
+            
+
+            setTimeout(() => {
+                navigate("/home");
+            }, 1500);
+
         } catch (err) {
             console.error(err);
-            setError("Login failed. Check your credentials.");
+            if (err.response && err.response.status === 401) {
+                toast.error("Invalid credentials. Please try again.", { position: "top-right" });
+            } else {
+                toast.error("Login failed. Something went wrong.", { position: "top-right" });
+            }
+            // setError("Login failed. Check your credentials.");
         }
     };
+
+    useEffect(()=> {
+       let data = localStorage.getItem("user") 
+
+       console.log(data);
+       
+
+       if(data){
+        navigate('/home')
+       }else{
+        navigate('/login')
+       }
+
+
+    },[navigate])
 
 
     return (
         <Container maxWidth="xs">
+            <ToastContainer />
             <Box
                 sx={{
                     display: "flex",

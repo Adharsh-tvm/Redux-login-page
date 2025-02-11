@@ -3,6 +3,7 @@ import { useState } from "react";
 import { setUser } from "../redux/slices/authSlice"; // Import Redux action
 import { Box, Button, TextField, Avatar, Typography } from "@mui/material";
 import { useNavigate } from "react-router";
+import Header from "../components/Header";
 
 const Profile = () => {
 
@@ -34,6 +35,8 @@ const Profile = () => {
     };
 
     return (
+        <>
+        <Header />
         <Box sx={{ textAlign: "center", maxWidth: 400, mx: "auto", mt: 5, p: 3, boxShadow: 3, borderRadius: 2 }}>
             <Typography variant="h5" gutterBottom>Profile</Typography>
             
@@ -50,7 +53,7 @@ const Profile = () => {
                                 label="Username" 
                                 value={username} 
                                 onChange={(e) => setUsername(e.target.value)} 
-                            />
+                                />
                             <Button variant="contained" onClick={handleSave} sx={{ mt: 2 }}>Save</Button>
                         </>
                     ) : (
@@ -67,6 +70,7 @@ const Profile = () => {
                 <Typography>Please log in.</Typography>
             )}
         </Box>
+        </>
     );
 };
 

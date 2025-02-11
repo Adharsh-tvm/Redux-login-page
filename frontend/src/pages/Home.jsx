@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Container, Box, Typography, Avatar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
@@ -20,6 +20,15 @@ const Home = () => {
             navigate("/login"); // Redirect to login if no user
         }
     };
+
+    useEffect(() => {
+        let data = localStorage.getItem('user')
+
+        if (!user) {
+            navigate('/login')
+        }
+
+    })
 
     const handleLogout = async () => {
         await authService.logoutUser();
