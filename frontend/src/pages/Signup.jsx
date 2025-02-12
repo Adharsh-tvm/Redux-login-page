@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form"; // ✅ Import useForm
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/slices/authSlice";
@@ -31,8 +31,11 @@ const Signup = () => {
             console.log("Signup success:", response.data);
 
             dispatch(setUser(response.data));  // Store in Redux & LocalStorage
-            toast.success("Login successful!", { position: "top-center" });
-            navigate("/home");
+            toast.success("Sign up successfull!", { position: "top-center" });
+            setTimeout(() => {
+                navigate("/home");
+            }, 1500);
+
         } catch (err) {
             if (err.response && err.response.status === 400) {
                 // setError(err.response.data.message);  // ✅ Show correct error message
@@ -43,6 +46,16 @@ const Signup = () => {
             }
         }
     };
+
+    useEffect(() => {
+            let data = localStorage.getItem("user");
+    
+            if (data) {
+                navigate('/home');
+            }else{
+                navigate('/signup')
+            }
+        }, [navigate]);
 
     return (
         <Container maxWidth="xs">

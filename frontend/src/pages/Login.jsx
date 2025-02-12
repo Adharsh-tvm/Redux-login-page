@@ -25,7 +25,7 @@ const Login = () => {
 
             dispatch(setUser(response.data));  // Store in Redux & LocalStorage
 
-            toast.success("Login successful!", { position: "top-center" });
+            toast.success("Login successfull!", { position: "top-center" });
 
             setTimeout(() => {
                 navigate("/home");
