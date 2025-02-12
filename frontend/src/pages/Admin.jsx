@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { 
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
-    Paper, TextField, IconButton 
+import {
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+    Paper, TextField, IconButton, Dialog, DialogActions,
+    DialogContent, DialogContentText, DialogTitle, Button, MenuItem
 } from "@mui/material";
-import { Edit, Delete, Save } from "@mui/icons-material";
+import { Edit, Delete, Save, Search, Add, Cancel } from "@mui/icons-material";
 import Header from "../components/Header";
 import { useNavigate } from "react-router";
 import authService from "../services/authService";
@@ -14,32 +15,39 @@ const Admin = () => {
     const [users, setUsers] = useState([]);
     const [editingId, setEditingId] = useState(null);
     const [editedUser, setEditedUser] = useState({});
+    const [search, setSearch] = useState("");
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState(null);
+    const [createDialogOpen, setCreateDialogOpen] = useState(false);
+    const [newUser, setNewUser] = useState({ username: "", email: "", password: "" });
+    const [role, setRole] = useState(null)
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    // Check if user is logged in
     useEffect(() => {
-        const user = localStorage.getItem('user');
+        const user = localStorage.getItem("user");
         if (!user) {
-            navigate('/admin/login');
+            navigate("/admin/login");
         }
     }, [navigate]);
 
-    // Fetch all users
     useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await axios.get("http://localhost:8000/api", {
-                    headers: { "Content-Type": "application/json" },
-                    withCredentials: true,
-                });
-                setUsers(response.data); // Set fetched users in state
-            } catch (error) {
-                console.error("Error fetching users:", error);
-            }
-        };
-        fetchUsers(); // Call the function
+        fetchUsers();
     }, []);
+
+    const fetchUsers = async () => {
+        try {
+            const response = await axios.get("http://localhost:8000/api", {
+                headers: { "Content-Type": "application/json" },
+                withCredentials: true,
+            });
+            setUsers(response.data);
+            setRole(response.data.isAdmin == true ? "Admin" : "User")
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+    };
 
     const handleEdit = (user) => {
         setEditingId(user._id);
@@ -47,8 +55,10 @@ const Admin = () => {
     };
 
     const handleSave = async () => {
+        if (!editingId) return;
+
         try {
-            await axios.put(`http://localhost:8000/api/users/${editingId}`, editedUser, { withCredentials: true });
+            await axios.put(`http://localhost:8000/api/${editingId}`, editedUser, { withCredentials: true });
             setUsers(users.map((user) => (user._id === editingId ? editedUser : user)));
             setEditingId(null);
         } catch (error) {
@@ -56,14 +66,47 @@ const Admin = () => {
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDeleteConfirm = (id) => {
+        setSelectedUserId(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleDelete = async () => {
         try {
-            await axios.delete(`http://localhost:8000/api/users/${id}`, { withCredentials: true });
-            setUsers(users.filter((user) => user._id !== id));
+            await axios.delete(`http://localhost:8000/api/${selectedUserId}`, { withCredentials: true });
+            setUsers(users.filter((user) => user._id !== selectedUserId));
         } catch (error) {
             console.error("Error deleting user:", error);
         }
+        setDeleteDialogOpen(false);
     };
+
+    const handleCreateUser = async () => {
+        if (!newUser.username || !newUser.email || !newUser.password || !newUser.confirmPassword) {
+            alert("Please fill all fields!");
+            return;
+        }
+    
+        if (newUser.password !== newUser.confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
+        if (newUser.password.length < 6) {
+            alert("Password must be at least 6 characters long.");
+            return;
+        }
+        
+    
+        try {
+            const response = await axios.post("http://localhost:8000/api", newUser, { withCredentials: true });
+            setUsers([...users, response.data]);
+            setCreateDialogOpen(false);
+            setNewUser({ username: "", email: "", password: "", confirmPassword: "", role: "user" });
+        } catch (error) {
+            console.error("Error creating user:", error);
+        }
+    };
+    
 
     const handleLogout = async () => {
         await authService.logoutUser();
@@ -76,6 +119,29 @@ const Admin = () => {
             <Header onLogout={handleLogout} />
             <div style={{ padding: "20px" }}>
                 <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Admin Dashboard</h2>
+
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+                    <TextField
+                        label="Search by Username"
+                        variant="outlined"
+                        fullWidth
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        InputProps={{
+                            endAdornment: <Search />
+                        }}
+                    />
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<Add />}
+                        onClick={() => setCreateDialogOpen(true)}
+                        style={{ marginLeft: "10px" }}
+                    >
+                        Create User
+                    </Button>
+                </div>
+
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
@@ -83,55 +149,134 @@ const Admin = () => {
                                 <TableCell><b>ID</b></TableCell>
                                 <TableCell><b>Username</b></TableCell>
                                 <TableCell><b>Email</b></TableCell>
+                                <TableCell><b>Role</b></TableCell>
                                 <TableCell><b>Actions</b></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {users.map((user) => (
-                                <TableRow key={user._id}>
-                                    <TableCell>{user._id}</TableCell>
-                                    <TableCell>
-                                        {editingId === user._id ? (
-                                            <TextField 
-                                                value={editedUser.username || ""} 
-                                                onChange={(e) => setEditedUser({ ...editedUser, username: e.target.value })} 
-                                                size="small"
-                                            />
-                                        ) : (
-                                            user.username
-                                        )}
-                                    </TableCell>
-                                    <TableCell>
-                                        {editingId === user._id ? (
-                                            <TextField 
-                                                value={editedUser.email || ""} 
-                                                onChange={(e) => setEditedUser({ ...editedUser, email: e.target.value })} 
-                                                size="small"
-                                            />
-                                        ) : (
-                                            user.email
-                                        )}
-                                    </TableCell>
-                                    <TableCell>
-                                        {editingId === user._id ? (
-                                            <IconButton color="primary" onClick={handleSave}>
-                                                <Save />
-                                            </IconButton>
-                                        ) : (
-                                            <IconButton color="secondary" onClick={() => handleEdit(user)}>
-                                                <Edit />
-                                            </IconButton>
-                                        )}
-                                        <IconButton color="error" onClick={() => handleDelete(user._id)}>
-                                            <Delete />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                            {users
+                                .filter((user) => user.username.toLowerCase().includes(search.toLowerCase()))
+                                .map((user) => (
+                                    <TableRow key={user._id}>
+                                        <TableCell>{user._id}</TableCell>
+                                        <TableCell>
+                                            {editingId === user._id ? (
+                                                <TextField
+                                                    value={editedUser.username || ""}
+                                                    onChange={(e) =>
+                                                        setEditedUser({ ...editedUser, username: e.target.value })
+                                                    }
+                                                    size="small"
+                                                />
+                                            ) : (
+                                                user.username
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            {editingId === user._id ? (
+                                                <TextField
+                                                    value={editedUser.email || ""}
+                                                    onChange={(e) =>
+                                                        setEditedUser({ ...editedUser, email: e.target.value })
+                                                    }
+                                                    size="small"
+                                                />
+                                            ) : (
+                                                user.email
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            {user.isAdmin ? "Admin" : "User"}
+                                        </TableCell>
+                                        <TableCell>
+                                            {editingId === user._id ? (
+                                                <IconButton color="primary" onClick={handleSave}>
+                                                    <Save />
+                                                </IconButton>
+                                            ) : (
+                                                user.isAdmin !== true && (
+                                                    <>
+                                                        <IconButton color="secondary" onClick={() => handleEdit(user)}>
+                                                            <Edit />
+                                                        </IconButton>
+                                                        <IconButton color="error" onClick={() => handleDeleteConfirm(user._id)}>
+                                                            <Delete />
+                                                        </IconButton>
+                                                    </>
+                                                )
+                                            )}
+
+
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
             </div>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>Are you sure you want to delete this user? This action cannot be undone.</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+                        <Cancel /> Cancel
+                    </Button>
+                    <Button onClick={handleDelete} color="error">
+                        <Delete /> Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Create User Dialog */}
+            <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)}>
+                <DialogTitle>Create New User</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="Username"
+                        fullWidth
+                        margin="dense"
+                        value={newUser.username}
+                        onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                    />
+                    <TextField
+                        label="Email"
+                        fullWidth
+                        margin="dense"
+                        value={newUser.email}
+                        onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                    />
+                    <TextField
+                        label="Password"
+                        fullWidth
+                        margin="dense"
+                        type="password"
+                        value={newUser.password}
+                        onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                    />
+                    <TextField
+                        label="Confirm Password"
+                        fullWidth
+                        margin="dense"
+                        type="password"
+                        value={newUser.confirmPassword}
+                        onChange={(e) => setNewUser({ ...newUser, confirmPassword: e.target.value })}
+                    />
+
+                    
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setCreateDialogOpen(false)} color="primary">
+                        <Cancel /> Cancel
+                    </Button>
+                    <Button onClick={handleCreateUser} color="primary">
+                        <Add /> Create
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };

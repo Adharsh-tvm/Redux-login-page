@@ -29,7 +29,7 @@ function AdminLogin() {
 
             dispatch(setUser(response.data));  // Store in Redux & LocalStorage
 
-            toast.success("Login successfull!", { position: "top-right" })
+            toast.success("Login successfull!", { position: "top-center" })
 
             
 
@@ -40,9 +40,9 @@ function AdminLogin() {
         } catch (err) {
             console.error(err);
             if (err.response && err.response.status === 401) {
-                toast.error("Invalid credentials. Please try again.", { position: "top-right" });
+                toast.error("Invalid credentials. Please try again.", { position: "top-center" });
             } else {
-                toast.error("Login failed. Something went wrong.", { position: "top-right" });
+                toast.error("Login failed. Something went wrong.", { position: "top-center" });
             }
             // setError("Login failed. Check your credentials.");
         }

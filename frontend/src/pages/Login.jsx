@@ -36,14 +36,14 @@ const Login = () => {
             if (err.response) {
                 // Show different error messages based on backend response
                 if (err.response.status === 400) {
-                    toast.error(err.response.data.message || "User does not exist.", { position: "top-right" });
+                    toast.error(err.response.data.message || "User does not exist.", { position: "top-center" });
                 } else if (err.response.status === 401) {
-                    toast.error("Invalid email or password. Please try again.", { position: "top-right" });
+                    toast.error("Invalid email or password. Please try again.", { position: "top-center" });
                 } else {
-                    toast.error("Login failed. Something went wrong.", { position: "top-right" });
+                    toast.error("Login failed. Something went wrong.", { position: "top-center" });
                 }
             } else {
-                toast.error("Server error. Please try again later.", { position: "top-right" });
+                toast.error("Server error. Please try again later.", { position: "top-center" });
             }
         }
     };

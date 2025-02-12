@@ -24,15 +24,15 @@ const Home = () => {
     useEffect(() => {
         let data = localStorage.getItem('user')
 
-        if (!user) {
-            navigate('/login')
+        if (!user || user.isAdmin == true) {
+            navigate(-1)
         }
 
     },[navigate])
 
     const handleLogout = async () => {
         await authService.logoutUser();
-        dispatch({ type: "auth/logout" }); // ✅ Dispatch a plain object to Redux
+        dispatch({ type: "auth/logout" }); //  Dispatch a plain object to Redux
 
         console.log("Logged Out");
         
