@@ -1,4 +1,5 @@
-import express from 'express'
+import express from 'express' 
+import upload from '../middlewares/multer.js';
 import { 
     createUser, 
     loginUser, 
@@ -8,7 +9,8 @@ import {
     updateCurentUserProfile,
     deleteUserById,
     getUserById,
-    updateUserById
+    updateUserById,
+    updateUserProfilePic
  } from '../controllers/userController.js';
 
 import { authenticate, authorizeAdmin } from '../middlewares/authMiddleware.js';
@@ -22,6 +24,7 @@ router.post('/auth', loginUser)
 router.post('/logout', logoutCurrentUser)
 
 router.route('/profile').get(authenticate, getCurrentUserProfile).put(authenticate, updateCurentUserProfile)
+router.put("/profile/upload", authenticate, upload.single("profilePic"), updateUserProfilePic);
 
 //Admin Routes
 router.route('/:id').delete(authenticate, authorizeAdmin, deleteUserById).get(authenticate, authorizeAdmin, getUserById).put(authenticate, authorizeAdmin, updateUserById)

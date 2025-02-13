@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Box, Typography, Avatar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
@@ -30,6 +30,9 @@ const Home = () => {
 
     },[navigate])
 
+
+    
+
     const handleLogout = async () => {
         await authService.logoutUser();
         dispatch({ type: "auth/logout" }); //  Dispatch a plain object to Redux
@@ -60,7 +63,8 @@ const Home = () => {
                     onClick={handleProfileClick}
                 >
                     <Avatar
-                        // src={user?.profilePicture || "https://via.placeholder.com/150"}
+                    
+                        src={user?.profilePic || "http://localhost:8000/api/profile"}
                         alt={user?.username || "Guest"}
                         sx={{ width: 100, height: 100, mb: 2 }}
                     />
