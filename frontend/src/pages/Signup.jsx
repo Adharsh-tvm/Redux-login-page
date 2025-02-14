@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form"; // ✅ Import useForm
+import { useForm } from "react-hook-form"; 
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/slices/authSlice";
-import { useNavigate, Link } from "react-router-dom"; // ✅ Import Link
+import { useNavigate, Link } from "react-router-dom"; 
 import axios from "axios";
 import { Box, Button, Container, TextField, Typography, Alert } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
@@ -13,7 +13,6 @@ const Signup = () => {
     const dispatch = useDispatch();
     const [error, setError] = useState("");
 
-    // ✅ Initialize useForm hook
     const {
         register,
         handleSubmit,
@@ -28,7 +27,7 @@ const Signup = () => {
                 withCredentials: true, // Important for sending cookies
             });
 
-            console.log("Signup success:", response.data);
+            // console.log("Signup success:", response.data);
 
             dispatch(setUser(response.data));  // Store in Redux & LocalStorage
             toast.success("Sign up successfull!", { position: "top-center" });
@@ -38,7 +37,7 @@ const Signup = () => {
 
         } catch (err) {
             if (err.response && err.response.status === 400) {
-                // setError(err.response.data.message);  // ✅ Show correct error message
+                // setError(err.response.data.message);  
                 toast.error("User already exists", { position: "top-center" });
             } else {
                 toast.error("Signup failed. Please try again.", { position: "top-center" });
@@ -135,7 +134,7 @@ const Signup = () => {
                         Sign Up
                     </Button>
 
-                    {/* ✅ "Already registered? Login" link */}
+        
                     <Typography variant="body2" sx={{ mt: 2 , ml:9 }}>
                         Already registered?{" "}
                         <Link to="/login" style={{ textDecoration: "none", color: "blue" }}>

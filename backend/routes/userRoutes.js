@@ -23,7 +23,8 @@ router.route("/").post(createUser).get(authenticate, authorizeAdmin, getAllUsers
 router.post('/auth', loginUser)
 router.post('/logout', logoutCurrentUser)
 
-router.route('/profile').get(authenticate, getCurrentUserProfile).put(authenticate, updateCurentUserProfile)
+router.route('/profile').get(authenticate, getCurrentUserProfile)
+
 router.put("/profile/upload", authenticate, upload.single("profilePic"), updateUserProfilePic);
 
 //Admin Routes

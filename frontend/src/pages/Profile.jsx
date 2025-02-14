@@ -16,13 +16,7 @@ const Profile = () => {
     const [editing, setEditing] = useState(false);
     const [imageFile, setImageFile] = useState(null);
 
-    // const handleFileChange = (e) => {
-    //     const file = e.target.files[0];
-    //     if (file) {
-    //         setImageFile(file);
-    //         setProfilePic(URL.createObjectURL(file)); // Preview the image
-    //     }
-    // };
+    
 
     useEffect(() => {
 
@@ -96,7 +90,7 @@ const Profile = () => {
 
                         {editing ? (
                             <>
-                                <input type="file" accept="image/*" onChange={handleFileChange} />
+                                <input type="file" accept="image/*"  onChange={handleFileChange} />
                                 <TextField fullWidth margin="normal" label="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
                                 <Button variant="contained" onClick={handleSave} sx={{ mt: 2 }}>Save</Button>
                             </>
