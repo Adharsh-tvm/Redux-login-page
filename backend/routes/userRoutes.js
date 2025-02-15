@@ -25,7 +25,8 @@ router.post('/logout', logoutCurrentUser)
 
 router.route('/profile').get(authenticate, getCurrentUserProfile)
 
-router.put("/profile/upload", authenticate, upload.single("profilePic"), updateUserProfilePic);
+router.put("/profile/upload", authenticate, upload.single("profilePic"), updateUserProfilePic ); 
+router.put("/profile/edit", updateCurentUserProfile ); 
 
 //Admin Routes
 router.route('/:id').delete(authenticate, authorizeAdmin, deleteUserById).get(authenticate, authorizeAdmin, getUserById).put(authenticate, authorizeAdmin, updateUserById)

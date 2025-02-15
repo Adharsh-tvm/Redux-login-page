@@ -12,6 +12,7 @@ const Profile = () => {
     const navigate = useNavigate();
 
     const [username, setUsername] = useState(user?.username || "");
+    const [email, setEmail] = useState(user?.email || "")
     const [profilePic, setProfilePic] = useState(user?.profilePic || "");
     const [editing, setEditing] = useState(false);
     const [imageFile, setImageFile] = useState(null);
@@ -50,6 +51,14 @@ const Profile = () => {
 
     const handleSave = async () => {
         const updatedUser = { ...user, username };
+
+        const resp = await axios.put("http://localhost:8000/api/profile/edit", {
+            username,
+            email,
+            userId : user._id
+        })
+
+        // resp.catch((e)=>{console.log(e)})
     
         if (imageFile) {
             const formData = new FormData();
@@ -92,6 +101,7 @@ const Profile = () => {
                             <>
                                 <input type="file" accept="image/*"  onChange={handleFileChange} />
                                 <TextField fullWidth margin="normal" label="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+                                <TextField fullWidth margin="normal" label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
                                 <Button variant="contained" onClick={handleSave} sx={{ mt: 2 }}>Save</Button>
                             </>
                         ) : (
