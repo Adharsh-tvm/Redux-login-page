@@ -26,7 +26,7 @@ const Header = ({ onLogout }) => {
                 </Toolbar>
             </AppBar>
 
-            {/* ✅ Logout Confirmation Dialog */}
+          
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Confirm Logout</DialogTitle>
                 <DialogContent>

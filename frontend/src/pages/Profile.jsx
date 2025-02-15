@@ -20,7 +20,7 @@ const Profile = () => {
 
     useEffect(() => {
 
-        console.log("1st " , username, profilePic );
+        // console.log("1st " , username, profilePic );
         
         
         const fetchProfile = async () => {
@@ -29,7 +29,7 @@ const Profile = () => {
                 dispatch(setUser(data));  // Update Redux store
                 setUsername(data.username);
                 setProfilePic(data.profilePic); // Ensure Cloudinary image is used
-                console.log("2nd " , username, profilePic );
+                // console.log("2nd " , username, profilePic );
             } catch (error) {
                 console.error("Failed to fetch profile:", error);
             }
@@ -44,7 +44,7 @@ const Profile = () => {
             setImageFile(file);
             setProfilePic(URL.createObjectURL(file)); // Show preview
         }
-        console.log("3rd " , username, profilePic );
+        // console.log("3rd " , username, profilePic );
     };
 
 
