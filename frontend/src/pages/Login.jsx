@@ -13,6 +13,9 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -21,7 +24,7 @@ const Login = () => {
                 withCredentials: true, // Ensures cookies are sent
             });
 
-            console.log("Login success:", response.data);
+            console.log("Login success:", response);
 
             dispatch(setUser(response.data));  // Store in Redux & LocalStorage
 

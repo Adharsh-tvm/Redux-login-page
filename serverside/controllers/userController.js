@@ -2,6 +2,7 @@ import User from '../models/userModel.js'
 import asyncHandler from '../middlewares/asyncHandler.js'
 import bcrypt from 'bcryptjs'
 import createToken from '../utils/createToken.js'
+import cloudinary from '../config/cloudinary.js';
 
 const createUser = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
@@ -61,6 +62,7 @@ const loginUser = asyncHandler(async (req, res) => {
         username: existingUser.username,
         email: existingUser.email,
         isAdmin: existingUser.isAdmin,
+        profilePic:existingUser.profilePic,
     });
 });
 
@@ -99,7 +101,8 @@ const getCurrentUserProfile = asyncHandler(async (req, res) => {
 
 
 const updateCurentUserProfile = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id)
+    console.log(req)
+    const user = await User.findById(req.body.userId)
 
     if (user) {
         user.username = req.body.username || user.username
@@ -124,6 +127,34 @@ const updateCurentUserProfile = asyncHandler(async (req, res) => {
         throw new Error("User not found")
     }
 })
+
+const updateUserProfilePic = asyncHandler(async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "No file uploaded" });
+        }
+
+        // Upload file to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: "profile_pics",
+        });
+
+        // Update the user profile in the database
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        user.profilePic = result.secure_url; // Save the Cloudinary URL
+        await user.save();
+
+        res.json({ profilePic: result.secure_url });
+    } catch (error) {
+        console.error("Upload Error:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
 
 
 const deleteUserById = asyncHandler( async (req, res) => {
@@ -188,5 +219,6 @@ export {
     updateCurentUserProfile,
     deleteUserById,
     getUserById,
-    updateUserById
+    updateUserById,
+    updateUserProfilePic 
  };
