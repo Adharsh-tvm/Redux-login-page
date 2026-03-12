@@ -17,7 +17,6 @@ const Profile = () => {
     const [editing, setEditing] = useState(false);
     const [imageFile, setImageFile] = useState(null);
 
-    
 
     useEffect(() => {
 
@@ -60,6 +59,8 @@ const Profile = () => {
 
         // resp.catch((e)=>{console.log(e)})
     
+        
+
         if (imageFile) {
             const formData = new FormData();
             formData.append("profilePic", imageFile);
@@ -103,6 +104,7 @@ const Profile = () => {
                                 <TextField fullWidth margin="normal" label="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
                                 <TextField fullWidth margin="normal" label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
                                 <Button variant="contained" onClick={handleSave} sx={{ mt: 2 }}>Save</Button>
+                                <Button variant="contained" onClick={()=>setEditing(false)} sx={{ mt: 2,ml : 1 }} >Back</Button>
                             </>
                         ) : (
                             <>
